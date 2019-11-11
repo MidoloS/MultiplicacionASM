@@ -1,0 +1,314 @@
+---------------------------------------------
+PIC ASSEMBLER LISTING
+Line    Address Opcode  Instruction
+---------------------------------------------
+0001    0000            ;
+0002    0000            ;	Cuando hice este codigo solo Dios y yo sabiamos como funcionaba
+0003    0000            ;	Ahora solo Dios lo sabe
+0004    0000            ;
+0005    0000            
+0006    0000            UNIDAD equ 020h
+0007    0000            DECENA equ 021h
+0008    0000            CENTENA equ 022h
+0009    0000            UMIL equ 023h
+0010    0000            AUX1 equ 024h
+0011    0000            AUX2 equ 025h
+0012    0000            CONTADOR equ 026h
+0013    0000            CONTADOR_DELAY equ 027h
+0014    0000            N1U equ 028h
+0015    0000            N2U equ 029h
+0016    0000            N1D equ 030h
+0017    0000            N2D equ 031h
+0018    0000            AUX3 equ 033h
+0019    0000            AUX4 equ 034h
+0020    0000            
+0021    0000            	org 0
+0022    0000            Config
+0023    0000    1683    	bsf status,5
+0024    0001    0185    	clrf trisa
+0025    0002    0186    	clrf trisb
+0026    0003    1406    	bsf trisb,0	; Mostrar
+0027    0004    1605    	bsf trisa,4	; Reset
+0028    0005    1705    	bsf trisa,6	; G1 (Incrementar N1)
+0029    0006    1785    	bsf trisa,7	; G2 (Incrementar N2)
+0030    0007    1283    	bcf status,5
+0031    0008            
+0032    0008            
+0033    0008            Botones
+0034    0008    201B    	call mostrarDatosIngresados
+0035    0009            
+0036    0009    1806    	btfsc portb,0
+0037    000A    2851    	goto multiplicar
+0038    000B    1A05    	btfsc porta,4
+0039    000C    2835    	goto resetearDatos
+0040    000D    1B05    	btfsc porta,6
+0041    000E    283A    	goto IncPrimerNumero
+0042    000F    1B85    	btfsc porta,7
+0043    0010    2843    	goto IncSegundoNumero
+0044    0011    2808    	goto Botones
+0045    0012            
+0046    0012            ResetBotones
+0047    0012    1806    	btfsc portb,0
+0048    0013    2812    	goto ResetBotones
+0049    0014    1A05    	btfsc porta,4
+0050    0015    2812    	goto ResetBotones
+0051    0016    1B05    	btfsc porta,6
+0052    0017    2812    	goto ResetBotones
+0053    0018    1B85    	btfsc porta,7
+0054    0019    2812    	goto ResetBotones
+0055    001A    2808    	goto Botones
+0056    001B            
+0057    001B            mostrarDatosIngresados
+0058    001B    1485    	bsf porta,1
+0059    001C    0828    	movfw N1U
+0060    001D    20CE    	call Tabla
+0061    001E    0086    	movwf portb
+0062    001F    204C    	call delay
+0063    0020    1085    	bcf porta,1
+0064    0021            
+0065    0021    1405    	bsf porta,0
+0066    0022    0830    	movfw N1D
+0067    0023    20CE    	call Tabla
+0068    0024    0086    	movwf portb
+0069    0025    204C    	call delay
+0070    0026    1005    	bcf porta,0
+0071    0027    204C    	call delay
+0072    0028            
+0073    0028    1505    	bsf porta,2
+0074    0029    0829    	movfw N2U
+0075    002A    20CE    	call Tabla
+0076    002B    0086    	movwf portb
+0077    002C    204C    	call delay
+0078    002D    1105    	bcf porta,2
+0079    002E            	
+0080    002E    1585    	bsf porta,3
+0081    002F    0831    	movfw N2D
+0082    0030    20CE    	call Tabla
+0083    0031    0086    	movwf portb
+0084    0032    204C    	call delay
+0085    0033    1185    	bcf porta,3
+0086    0034    0008    	return
+0087    0035            
+0088    0035            resetearDatos
+0089    0035    01A8    	clrf N1U
+0090    0036    01A9    	clrf N2U
+0091    0037    01B0    	clrf N1D
+0092    0038    01B1    	clrf N2D
+0093    0039    2812    	goto ResetBotones
+0094    003A            
+0095    003A            IncPrimerNumero
+0096    003A    3009    	movlw .9
+0097    003B    0228    	subwf N1U,W 
+0098    003C    1803    	btfsc status,c
+0099    003D    2840    	goto IncDecena
+0100    003E    0AA8    	incf N1U,f
+0101    003F    2812    	goto ResetBotones
+0102    0040            
+0103    0040            IncDecena
+0104    0040    01A8    	clrf N1U
+0105    0041    0AB0    	incf N1D,f
+0106    0042    2812    	goto ResetBotones
+0107    0043            
+0108    0043            IncSegundoNumero
+0109    0043    3009    	movlw .9
+0110    0044    0229    	subwf N2U,W 
+0111    0045    1803    	btfsc status,c
+0112    0046    2849    	goto IncMil
+0113    0047    0AA9    	incf N2U,f
+0114    0048    2812    	goto ResetBotones
+0115    0049            IncMil
+0116    0049    01A9    	clrf N2U
+0117    004A    0AB1    	incf N2D,f
+0118    004B    2812    	goto ResetBotones
+0119    004C            
+0120    004C            delay
+0121    004C    30FF    	movlw	.255
+0122    004D    00A7    	movwf	CONTADOR_DELAY
+0123    004E    0BA7    	decfsz	CONTADOR_DELAY, f
+0124    004F    284E    	goto	$-1
+0125    0050    0008    	return
+0126    0051            
+0127    0051            multiplicar
+0128    0051    0828    	movfw N1U	; MULTIPLICACION LINEAL
+0129    0052    00A6    	movwf CONTADOR
+0130    0053    0AA6    	incf CONTADOR,f
+0131    0054            parte1
+0132    0054    0BA6    	decfsz CONTADOR,f
+0133    0055    2857    	goto parte2
+0134    0056    2860    	goto parte3
+0135    0057    0829    parte2	movfw N2U
+0136    0058    07A4    	addwf AUX1,f
+0137    0059    300A    	movlw .10
+0138    005A    0224    	subwf AUX1,w
+0139    005B    1C03    	btfss status,c
+0140    005C    2854    	goto parte1
+0141    005D    00A4    	movwf AUX1
+0142    005E    0AA5    	incf AUX2,1
+0143    005F    2854    	goto parte1
+0144    0060            parte3
+0145    0060            	; MOVER VALORES A RESULTADOS TEMPORALES
+0146    0060    0824    	movfw AUX1
+0147    0061    00A0    	movwf UNIDAD
+0148    0062    0825    	movfw AUX2
+0149    0063    00A1    	movwf DECENA
+0150    0064    0828    	movfw N1U
+0151    0065    00A6    	movwf CONTADOR
+0152    0066            	; PREPARANDO MULTIPLICACION CRUZADA
+0153    0066    0AA6    	incf CONTADOR,f
+0154    0067    01A4    	clrf AUX1
+0155    0068            parte4
+0156    0068            	
+0157    0068    0BA6    	decfsz CONTADOR,f
+0158    0069    286B    	goto parte5	; CONTINUA MULTIPLICANDO
+0159    006A    2876    	goto wea	; TERMINO LA MULTIPLICACION
+0160    006B    0831    parte5	movfw N2D
+0161    006C    07A4    	addwf AUX1,f
+0162    006D    300A    	movlw .10
+0163    006E    0224    	subwf AUX1,w
+0164    006F    1C03    	btfss status,c
+0165    0070    2868    	goto parte4
+0166    0071    00A4    	movwf AUX1
+0167    0072    0AA5    	incf AUX2,1
+0168    0073    0824    	movfw AUX1
+0169    0074    00A1    	movwf DECENA
+0170    0075    2868    	goto parte4
+0171    0076            
+0172    0076            
+0173    0076            
+0174    0076            
+0175    0076            
+0176    0076            wea
+0177    0076            	; MOVER VALORES A RESULTADOS TEMPORALES
+0178    0076    0830    	movfw N1D
+0179    0077    00A6    	movwf CONTADOR
+0180    0078            	; PREPARANDO MULTIPLICACION CRUZADA
+0181    0078    0AA6    	incf CONTADOR,f
+0182    0079            wea1
+0183    0079    0BA6    	decfsz CONTADOR,f
+0184    007A    287C    	goto wea2	; CONTINUA MULTIPLICANDO
+0185    007B    2885    	goto parte6	; TERMINO LA MULTIPLICACION
+0186    007C    0829    wea2	movfw N2U
+0187    007D    07B4    	addwf AUX4,f
+0188    007E    300A    	movlw .10
+0189    007F    0234    	subwf AUX4,w
+0190    0080    1C03    	btfss status,c
+0191    0081    2879    	goto wea1
+0192    0082    00B4    	movwf AUX4
+0193    0083    0AB4    	incf AUX4,1
+0194    0084    2879    	goto wea1
+0195    0085            
+0196    0085            
+0197    0085            
+0198    0085            
+0199    0085            parte6
+0200    0085    0824    	movfw AUX1
+0201    0086    0734    	addwf AUX4,w ; DECENA + AUX
+0202    0087    00A1    	movwf DECENA
+0203    0088    300A    	movlw .10
+0204    0089    0221    	subwf DECENA,w
+0205    008A    1803    	btfsc status,c
+0206    008B    20A8    	call corregir
+0207    008C    0825    	movfw AUX2
+0208    008D    07A2    	addwf CENTENA,f
+0209    008E    300A    	movlw .10
+0210    008F    0222    	subwf CENTENA,w
+0211    0090    1803    	btfsc status,c
+0212    0091    20AB    	call corregir2
+0213    0092            	
+0214    0092            
+0215    0092    0830    	movfw N1D	; MULTIPLICACION LINEAL
+0216    0093    00A6    	movwf CONTADOR
+0217    0094    0AA6    	incf CONTADOR,f
+0218    0095    01A4    	clrf AUX1
+0219    0096    01A5    	clrf AUX2
+0220    0097            parte7
+0221    0097    0BA6    	decfsz CONTADOR,f
+0222    0098    289A    	goto parte8
+0223    0099    28A3    	goto parte9	; fin
+0224    009A    0831    parte8	movfw N2D
+0225    009B    07A4    	addwf AUX1,f
+0226    009C    300A    	movlw .10
+0227    009D    0224    	subwf AUX1,w
+0228    009E    1C03    	btfss status,c
+0229    009F    2897    	goto parte7
+0230    00A0    00A4    	movwf AUX1
+0231    00A1    0AA5    	incf AUX2,1
+0232    00A2    2897    	goto parte7
+0233    00A3            parte9
+0234    00A3    0824    	movfw AUX1
+0235    00A4    07A2    	addwf CENTENA,f
+0236    00A5    0825    	movfw AUX2
+0237    00A6    07A3    	addwf UMIL,f
+0238    00A7    28AE    	goto mostrado
+0239    00A8            	
+0240    00A8            	
+0241    00A8            	
+0242    00A8            corregir
+0243    00A8    00A1    	movwf DECENA
+0244    00A9    0AA2    	incf CENTENA,1
+0245    00AA    0008    	return
+0246    00AB            corregir2
+0247    00AB    00A2    	movwf CENTENA
+0248    00AC    0AA3    	incf UMIL,1
+0249    00AD    0008    	return
+0250    00AE            	
+0251    00AE            
+0252    00AE            	
+0253    00AE            
+0254    00AE            mostrado
+0255    00AE    01A4    	clrf AUX1
+0256    00AF    01A5    	clrf AUX2
+0257    00B0    20B4    	call mostrarDatosResultado
+0258    00B1    1A05    	btfsc porta,4
+0259    00B2    2812    	goto ResetBotones
+0260    00B3    28AE    	goto mostrado
+0261    00B4            
+0262    00B4            mostrarDatosResultado
+0263    00B4    1485    	bsf porta,1
+0264    00B5    0820    	movfw UNIDAD
+0265    00B6    20CE    	call Tabla
+0266    00B7    0086    	movwf portb
+0267    00B8    204C    	call delay
+0268    00B9    1085    	bcf porta,1
+0269    00BA            
+0270    00BA    1405    	bsf porta,0
+0271    00BB    0821    	movfw DECENA
+0272    00BC    20CE    	call Tabla
+0273    00BD    0086    	movwf portb
+0274    00BE    204C    	call delay
+0275    00BF    1005    	bcf porta,0
+0276    00C0    204C    	call delay
+0277    00C1            
+0278    00C1    1505    	bsf porta,2
+0279    00C2    0822    	movfw CENTENA
+0280    00C3    20CE    	call Tabla
+0281    00C4    0086    	movwf portb
+0282    00C5    204C    	call delay
+0283    00C6    1105    	bcf porta,2
+0284    00C7            	
+0285    00C7    1585    	bsf porta,3
+0286    00C8    0823    	movfw UMIL
+0287    00C9    20CE    	call Tabla
+0288    00CA    0086    	movwf portb
+0289    00CB    204C    	call delay
+0290    00CC    1185    	bcf porta,3
+0291    00CD    0008    	return
+0292    00CE            
+0293    00CE            
+0294    00CE            Tabla
+0295    00CE    0782    	addwf PCL,1
+0296    00CF            		; 01234567
+0297    00CF    347F    	RETLW	b'01111111'	
+0298    00D0    340D    	RETLW	b'00001101'
+0299    00D1    34B7    	RETLW	b'10110111'
+0300    00D2    349F    	RETLW	b'10011111'
+0301    00D3    34CD    	RETLW	b'11001101'
+0302    00D4    34DB    	RETLW	b'11011011'
+0303    00D5    34FB    	RETLW	b'11111011'
+0304    00D6    340F    	RETLW	b'00001111'
+0305    00D7    34FF    	RETLW	b'11111111'
+0306    00D8    34CF    	RETLW	b'11001111'
+0307    00D9            	end
+0308    00D9            	
+---------------------------------------------
+Number of errors = 0
