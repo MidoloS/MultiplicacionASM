@@ -57,7 +57,7 @@ COMRPOBAR_BOTONES
 	goto COMRPOBAR_BOTONES
 	goto BOTONES
 
-MOSTRAR DATOS
+MOSTRAR_DATOS
     ; Activar display's, mover informacion de variable, asignar valor de la tabla y mostrarla en puerto B.
 	bsf porta,1
 	movfw N1U
@@ -152,12 +152,12 @@ PARTE_1
 	goto PARTE_2
 	goto PARTE_3
 PARTE_2	
-    movfw N2U
+	movfw N2U
 	addwf AUX1,f
 	movlw .10
 	subwf AUX1,w
 	btfss status,c
-	goto parte1
+	goto PARTE_1
 	movwf AUX1
 	incf AUX2,1
 	goto PARTE_1
@@ -172,8 +172,8 @@ PARTE_3
 	clrf AUX1
 PARTE_4
 	decfsz CONTADOR,f
-	goto parte5	
-	goto wea	
+	goto PARTE_5	
+	goto PARTE_10	
 PARTE_5	
     movfw N2D
 	addwf AUX1,f
@@ -258,8 +258,8 @@ MOSTRADO
 	clrf AUX2
 	call PANEL
 	btfsc porta,4
-	goto ResetBotones
-	goto mostrado
+	goto COMRPOBAR_BOTONES
+	goto MOSTRADO
 
 PANEL
 	bsf porta,1
